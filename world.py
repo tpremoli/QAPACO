@@ -43,5 +43,39 @@ class World:
                 
             print("Pheromone table created")
             
+            
+    def generate_ant_paths(self, m=1):
+        ants = []
+        rng = SystemRandom()
+        
+        # for each ant
+        for _ in range(m):
+            # Facilities lists the facilities that haven't yet been visited
+            facilities = [i for i in range(self.n_nodes)]
+            # random placement
+            ant_path = []
+            ant_path.append(rng.randint(0,self.n_nodes-1))
+            facilities.remove(ant_path[0])
+            
+            current_node = ant_path[0]
+            
+            # for each facility
+            for _ in range(self.n_nodes-1):
+                # getting the weights of each path
+                weights = []
+                for f in facilities:
+                    weights.append(self.distances[current_node][f])
+
+                # Picking next node to visit from facilities using weights
+                next_node = rng.choices(facilities, weights=weights, k=1)[0]          
+                
+                ant_path.append(next_node)               
+                current_node = next_node
+                
+            ants.append(ant_path)
+        
+        return ants
+        
 if __name__  == "__main__":
     w = World("Uni50a.dat")
+    a = w.generate_ant_paths()
