@@ -53,11 +53,12 @@ class World:
             # Facilities lists the facilities that haven't yet been visited
             facilities = [i for i in range(self.n_nodes)]
             # random placement
-            ant_path = []
-            ant_path.append(rng.randint(0,self.n_nodes-1))
-            facilities.remove(ant_path[0])
+            current_node = rng.randint(0,self.n_nodes-1)
             
-            current_node = ant_path[0]
+            facilities.remove(current_node)
+            
+            ant_path = []            
+            ant_path.append(current_node)
             
             # for each facility
             for _ in range(self.n_nodes-1):
@@ -65,11 +66,14 @@ class World:
                 weights = []
                 for f in facilities:
                     weights.append(self.distances[current_node][f])
-
+                if len(weights)  == 1:
+                    weights = [1]
                 # Picking next node to visit from facilities using weights
                 next_node = rng.choices(facilities, weights=weights, k=1)[0]          
                 
-                ant_path.append(next_node)               
+                ant_path.append(next_node)
+                
+                facilities.remove(next_node)
                 current_node = next_node
                 
             ants.append(ant_path)
@@ -91,7 +95,7 @@ class World:
 
                 # Getting distance and flow from current node to next node                
                 D = self.distances[current_node][next_node]
-                F = self.flow[current_node][next_node]
+                F = 100 - self.flow[current_node][next_node]
                 
                 current_cost += D*F
                 
@@ -136,7 +140,11 @@ class World:
 
 if __name__  == "__main__":
     w = World("Uni50a.dat")
-    a = w.generate_ant_paths()
-    c,ba = w.calc_fitnesses(a)
-    w.apply_pheromones(a,c)
-    w.evaporate_pheromones()
+    for x in range(100):
+        a = w.generate_ant_paths(100)
+        c,ba = w.calc_fitnesses(a)
+        w.apply_pheromones(a,c)
+        w.evaporate_pheromones(e=0.9)
+        
+    
+    
