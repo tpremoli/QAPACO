@@ -44,7 +44,7 @@ class World:
             print("Pheromone table created")
             
             
-    def generate_ant_paths(self, m=1):
+    def generate_ant_paths(self, m=5):
         ants = []
         rng = SystemRandom()
         
@@ -75,7 +75,35 @@ class World:
             ants.append(ant_path)
         
         return ants
+    
+    def calc_fitnesses(self, ant_paths):
+        costs = []
+        
+        for antpath in ant_paths:
+            path = antpath.copy()
+            
+            current_node = path.pop(0)
+            current_cost = 0            
+            for i in range(self.n_nodes-1):
+                next_node = path.pop(0)
+                
+                D = self.distances[current_node][next_node]
+                F = self.flow[current_node][next_node]
+                
+                current_cost += D*F
+                
+                current_node = next_node
+            
+            costs.append(current_cost)
+
+        min_index = min(range(len(costs)), key=costs.__getitem__)
+        best_ant = ant_paths[min_index]
+        
+        print("Best ant cost {}\n\t{}".format(min(costs), best_ant))
+        
+        return costs, best_ant
         
 if __name__  == "__main__":
     w = World("Uni50a.dat")
     a = w.generate_ant_paths()
+    c,ba = w.calc_fitnesses(a)
