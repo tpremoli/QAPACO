@@ -2,8 +2,13 @@ from random import SystemRandom
 
 
 class World:
-    def __init__(self, filename):
+    def __init__(self, filename, m=100, e=0.5):
         print("Initializing World with {}".format(filename))
+        
+        self.m = m
+        self.e = e
+        
+        print("Ant count: {}; Evaporation rate: {}".format(m,e))
         with open(filename, "r") as f:
             # Splitting data by  line
             data = f.read().split("\n")
@@ -44,10 +49,12 @@ class World:
             print("Pheromone table created")
             
             
-    def generate_ant_paths(self, m=5):
+    def generate_ant_paths(self, m=None):
         ants = []
         rng = SystemRandom()
         
+        if not m:
+            m = self.m
         # for each ant
         for _ in range(m):
             # Facilities lists the facilities that haven't yet been visited
@@ -139,16 +146,16 @@ class World:
         if e:
             mult_e = lambda x: x*e
         else:
-            
+            mult_e = lambda x: x*self.e
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat")
+    w = World("Uni50a.dat", m=1000, e=0.9)
     for x in range(100):
-        a = w.generate_ant_paths(100)
+        a = w.generate_ant_paths()
         c,ba = w.calc_fitnesses(a)
         w.apply_pheromones(a,c)
-        w.evaporate_pheromones(e=0.9)
+        w.evaporate_pheromones()
         
     
     
