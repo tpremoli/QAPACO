@@ -119,18 +119,24 @@ class World:
                 # Inversely proportional costs (lower cost = better)
                 pheromone = 1 / costs[i]
 
-                print(self.pheromones[current_node][next_node])
-
                 # Getting distance and flow from current node to next node                
                 self.pheromones[current_node][next_node] += pheromone
                 
-                print(self.pheromones[current_node][next_node])
-
                 current_node = next_node
-            
+    
+    def evaporate_pheromones(self, e=0.5):
+        """Evaporates pheromones according to evaporation rate
+
+        Args:
+            e (float, optional): Evaporation rate. Defaults to 0.5.
+        """
+        # Just quickly applying map function to the 2d array of pheromone vals
+        mult_e = lambda x: x*e
+        self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
     w = World("Uni50a.dat")
     a = w.generate_ant_paths()
     c,ba = w.calc_fitnesses(a)
     w.apply_pheromones(a,c)
+    w.evaporate_pheromones()
