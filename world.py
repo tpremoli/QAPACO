@@ -66,8 +66,9 @@ class World:
                 weights = []
                 for f in facilities:
                     weights.append(self.distances[current_node][f])
-                if len(weights)  == 1:
-                    weights = [1]
+                
+                if sum(weights) == 0:
+                    weights = [1 for _ in weights]
                 # Picking next node to visit from facilities using weights
                 next_node = rng.choices(facilities, weights=weights, k=1)[0]          
                 
@@ -128,14 +129,17 @@ class World:
                 
                 current_node = next_node
     
-    def evaporate_pheromones(self, e=0.5):
+    def evaporate_pheromones(self, e=None):
         """Evaporates pheromones according to evaporation rate
 
         Args:
             e (float, optional): Evaporation rate. Defaults to 0.5.
         """
         # Just quickly applying map function to the 2d array of pheromone vals
-        mult_e = lambda x: x*e
+        if e:
+            mult_e = lambda x: x*e
+        else:
+            
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
