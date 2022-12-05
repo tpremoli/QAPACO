@@ -60,7 +60,7 @@ class World:
             # Facilities lists the facilities that haven't yet been visited
             facilities = [i for i in range(self.n_nodes)]
             # random placement
-            current_node = rng.randint(0,self.n_nodes-1)
+            current_node = 0
             
             facilities.remove(current_node)
             
@@ -103,7 +103,10 @@ class World:
 
                 # Getting distance and flow from current node to next node                
                 D = self.distances[current_node][next_node]
-                F = 100 - self.flow[current_node][next_node]
+                if self.flow[current_node][next_node] == 0:
+                    F = 100
+                else:
+                    F = 1 / self.flow[current_node][next_node]
                 
                 current_cost += D*F
                 
@@ -150,8 +153,8 @@ class World:
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=1000, e=0.9)
-    for x in range(100):
+    w = World("Uni50a.dat", m=100, e=0.9)
+    for x in range(10000):
         a = w.generate_ant_paths()
         c,ba = w.calc_fitnesses(a)
         w.apply_pheromones(a,c)
