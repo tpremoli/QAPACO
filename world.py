@@ -80,13 +80,16 @@ class World:
         costs = []
         
         for antpath in ant_paths:
+            # We get current node and following node and calc fitness of that edge edge
             path = antpath.copy()
             
             current_node = path.pop(0)
             current_cost = 0            
-            for i in range(self.n_nodes-1):
+            for _ in range(self.n_nodes-1):
+                # This equation might not be correct. Asking Ayah
                 next_node = path.pop(0)
-                
+
+                # Getting distance and flow from current node to next node                
                 D = self.distances[current_node][next_node]
                 F = self.flow[current_node][next_node]
                 
@@ -103,7 +106,31 @@ class World:
         
         return costs, best_ant
         
+    def apply_pheromones(self, ant_paths, costs):
+        for i, antpath in enumerate(ant_paths):
+            # We get current node and following node and apply pheromone on that edge
+            path = antpath.copy()
+            
+            current_node = path.pop(0)
+            for _ in range(self.n_nodes-1):
+                # This equation might not be correct. Asking Ayah
+                next_node = path.pop(0)
+                
+                # Inversely proportional costs (lower cost = better)
+                pheromone = 1 / costs[i]
+
+                print(self.pheromones[current_node][next_node])
+
+                # Getting distance and flow from current node to next node                
+                self.pheromones[current_node][next_node] += pheromone
+                
+                print(self.pheromones[current_node][next_node])
+
+                current_node = next_node
+            
+
 if __name__  == "__main__":
     w = World("Uni50a.dat")
     a = w.generate_ant_paths()
     c,ba = w.calc_fitnesses(a)
+    w.apply_pheromones(a,c)
