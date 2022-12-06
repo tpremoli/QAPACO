@@ -67,8 +67,6 @@ class World:
             ant_path.append(0)
             
             curr_facility = 0
-            curr_loc = 0
-            next_loc = 1
             while unplaced_facilities:
                 pheromones = self.pheromones[curr_facility].copy()
                 for f in sorted(ant_path, reverse=True):
@@ -118,22 +116,11 @@ class World:
         return costs, best_ant
         
     def apply_pheromones(self, ant_paths, costs):
-        for i, antpath in enumerate(ant_paths):
-            # We get current node and following node and apply pheromone on that edge
-            path = antpath.copy()
+        for ant_index, ant_path in enumerate(ant_paths):
+            for location, facility in enumerate(ant_path):
+                applied_pheromone = 1 / costs[ant_index]
+                self.pheromones[facility][location] += applied_pheromone
             
-            current_node = path.pop(0)
-            for _ in range(self.n_nodes-1):
-                # This equation might not be correct. Asking Ayah
-                next_node = path.pop(0)
-                
-                # Inversely proportional costs (lower cost = better)
-                pheromone = 1 / costs[i]
-
-                # Getting distance and flow from current node to next node                
-                self.pheromones[current_node][next_node] += pheromone
-                
-                current_node = next_node
     
     def evaporate_pheromones(self, e=None):
         """Evaporates pheromones according to evaporation rate
@@ -149,7 +136,7 @@ class World:
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=10, e=0.9)
+    w = World("Uni50a.dat", m=100, e=0.5)
     
     for x in range(1000):
         a = w.generate_ant_paths()
