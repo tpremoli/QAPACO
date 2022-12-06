@@ -54,35 +54,33 @@ class World:
         
         if not m:
             m = self.m
+
         # for each ant
         for _ in range(m):
-            # Facilities lists the facilities that haven't yet been visited
-            facilities = [i for i in range(self.n_nodes)]
-            # random placement
-            current_node = 0
+            ant_path = []
+
+            # unplaced_facilities is the facilities not placed yet
+            unplaced_facilities = [x for x in range(self.n_nodes)]
+            unplaced_facilities.pop(0)
             
-            facilities.remove(current_node)
+            # faciity 0 is at position 0
+            ant_path.append(0)
             
-            ant_path = []            
-            ant_path.append(current_node)
+            curr_facility = 0
+            curr_loc = 0
+            next_loc = 1
+            while unplaced_facilities:
+                pheromones = self.pheromones[curr_facility].copy()
+                for f in sorted(ant_path, reverse=True):
+                    pheromones.pop(f)
+                
+                next_facility = rng.choices(unplaced_facilities, weights=pheromones, k=1)[0]
+                
+                unplaced_facilities.remove(next_facility)
+                ant_path.append(next_facility)
+                curr_facility = next_facility
+                
             
-            # for each facility
-            for _ in range(self.n_nodes-1):
-                # getting the weights of each path
-                weights = []
-                for f in facilities:
-                    weights.append(self.distances[current_node][f])
-                
-                if sum(weights) == 0:
-                    weights = [1 for _ in weights]
-                # Picking next node to visit from facilities using weights
-                next_node = rng.choices(facilities, weights=weights, k=1)[0]          
-                
-                ant_path.append(next_node)
-                
-                facilities.remove(next_node)
-                current_node = next_node
-                
             ants.append(ant_path)
         
         return ants
@@ -151,7 +149,7 @@ class World:
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.5)
+    w = World("Uni50a.dat", m=10, e=0.9)
     
     for x in range(1000):
         a = w.generate_ant_paths()
