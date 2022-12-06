@@ -98,7 +98,10 @@ class World:
             # This is exactly the math equation
             for i in range(self.n_nodes):
                 for j in range(self.n_nodes):
+                    # Distance between locations i and j
                     D = self.distances[i][j]
+                    
+                    # flow between the facilities at locations i and j
                     F = self.flow[antpath[i]][antpath[j]]
                     
                     cost += D*F
