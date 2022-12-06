@@ -1,6 +1,5 @@
 from random import SystemRandom
 
-
 class World:
     def __init__(self, filename, m=100, e=0.5):
         print("Initializing World with {}".format(filename))
@@ -92,27 +91,26 @@ class World:
         costs = []
         
         for antpath in ant_paths:
-            # We get current node and following node and calc fitness of that edge edge
             path = antpath.copy()
             
-            current_node = path.pop(0)
-            current_cost = 0            
-            for _ in range(self.n_nodes-1):
-                # This equation might not be correct. Asking Ayah
-                next_node = path.pop(0)
-
-                # Getting distance and flow from current node to next node                
-                D = self.distances[current_node][next_node]
-                if self.flow[current_node][next_node] == 0:
-                    F = 100
-                else:
-                    F = 1 / self.flow[current_node][next_node]
-                
-                current_cost += D*F
-                
-                current_node = next_node
+            cost = 0
             
-            costs.append(current_cost)
+            current_node = path.pop(0)
+            i = 0
+            j = 1
+            while path:
+                next_node = path.pop(0)
+                
+                D = self.distances[i][j]
+                F = self.flow[current_node][next_node]
+                
+                cost += D*F
+                             
+                current_node = next_node
+                i += 1
+                j += 1
+            
+            costs.append(cost)
 
         min_index = min(range(len(costs)), key=costs.__getitem__)
         best_ant = ant_paths[min_index]
@@ -153,12 +151,12 @@ class World:
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.9)
-    for x in range(10000):
+    w = World("Uni50a.dat", m=100, e=0.5)
+    
+    for x in range(1000):
         a = w.generate_ant_paths()
         c,ba = w.calc_fitnesses(a)
         w.apply_pheromones(a,c)
         w.evaporate_pheromones()
         
-    
     
