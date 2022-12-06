@@ -135,9 +135,12 @@ class World:
             mult_e = lambda x: x*self.e
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
-if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.9)
-    
+def runtest(w):
+    """This runs a quick test to ensure the pheromone placing works
+
+    Args:
+        w (world): the world to run the test on
+    """
     a = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]]
     c, ba = w.calc_fitnesses(a)
     for _ in range(500):
@@ -146,10 +149,18 @@ if __name__  == "__main__":
     
     a = w.generate_ant_paths()
     c,ba = w.calc_fitnesses(a)
-
-
     
-    for x in range(0):
+    # If the pheromone has been applied so many times, then the only real path should be the same one that was input
+    assert a[0] == ba
+    assert c[0] == 5941988
+
+if __name__  == "__main__":
+    w = World("Uni50a.dat", m=100, e=0.9)
+
+
+    # runtest(w)
+    
+    for x in range(100):
         a = w.generate_ant_paths()
         c,ba = w.calc_fitnesses(a)
         w.apply_pheromones(a,c)
