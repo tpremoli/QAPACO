@@ -91,20 +91,13 @@ class World:
             
             cost = 0
             
-            current_node = path.pop(0)
-            i = 0
-            j = 1
-            while path:
-                next_node = path.pop(0)
-                
-                D = self.distances[i][j]
-                F = self.flow[current_node][next_node]
-                
-                cost += D*F
-                             
-                current_node = next_node
-                i += 1
-                j += 1
+            # This is exactly the math equation
+            for i in range(self.n_nodes):
+                for j in range(self.n_nodes):
+                    D = self.distances[i][j]
+                    F = self.flow[antpath[i]][antpath[j]]
+                    
+                    cost += D*F
             
             costs.append(cost)
 
