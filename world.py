@@ -58,37 +58,41 @@ class World:
         # for each ant
         for _ in range(m):
             ant_path = []
-
-            # unplaced_facilities is the facilities not placed yet
-            unplaced_facilities = [x for x in range(self.n_nodes)]
-            unplaced_facilities.pop(0)
             
-            # faciity 0 is at position 0
+            # Facility 0 is at location 0
             ant_path.append(0)
             
-            curr_facility = 0
-            while unplaced_facilities:
-                pheromones = self.pheromones[curr_facility].copy()
-                for f in sorted(ant_path, reverse=True):
-                    pheromones.pop(f)
+            facilities = [i for i in range(1,self.n_nodes)]
+            
+            # the index in an ant path is the location (0-49)
+            # We want to place a random facility at each location according to pheromone
+            for loc in range(1, self.n_nodes):
+                # This is the  pheromones of each facility for being in the current location
+                all_facility_pheromones = self.column(self.pheromones, loc)
+                final_pheromones = []
                 
-                next_facility = rng.choices(unplaced_facilities, weights=pheromones, k=1)[0]
+                # We get remove the facilities that have already been placed at a location
+                for facility, pheromone in enumerate(all_facility_pheromones):
+                    if facility in facilities:
+                        final_pheromones.append(pheromone)
                 
-                unplaced_facilities.remove(next_facility)
+                # The pheromone corresponds to the fitness of putting facility i in location j
+                next_facility = rng.choices(facilities,weights=final_pheromones,k=1)[0]
                 ant_path.append(next_facility)
-                curr_facility = next_facility
-                
+                facilities.remove(next_facility)
             
             ants.append(ant_path)
-        
+                
         return ants
+    
+    def column(self, matrix, i):
+        return [row[i] for row in matrix]
+        
     
     def calc_fitnesses(self, ant_paths):
         costs = []
         
         for antpath in ant_paths:
-            path = antpath.copy()
-            
             cost = 0
             
             # This is exactly the math equation
@@ -129,7 +133,7 @@ class World:
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.5)
+    w = World("Uni50a.dat", m=100, e=0.9)
     
     for x in range(1000):
         a = w.generate_ant_paths()
