@@ -2,6 +2,16 @@ from random import SystemRandom
 
 class World:
     def __init__(self, filename, m=100, e=0.5):
+        """Initializes a world using an m (ant count) and e (evaporation coefficient)
+        A world in this case is a matrix of distances, a matrix of flow values between facilities, 
+        and a node count. A pheromone matrix is also created, where pheromone[i][j] is the bias of
+        placing facility i in location j.
+
+        Args:
+            filename (str): Distance and Flow filename to open
+            m (int, optional): ant count. Defaults to 100.
+            e (float, optional): evaporation rate. Defaults to 0.5.
+        """
         print("Initializing World with {}".format(filename))
         
         self.m = m
@@ -49,6 +59,14 @@ class World:
             
             
     def generate_ant_paths(self, m=None):
+        """Generates and returns m ants. if m not passed, uses world m.
+
+        Args:
+            m (int, optional): Ant count. Defaults to self.m.
+
+        Returns:
+            list(int): a list of int values. In this list, list[location] = facility
+        """
         ants = []
         rng = SystemRandom()
         
@@ -86,10 +104,28 @@ class World:
         return ants
     
     def column(self, matrix, i):
+        """Returns a matrix column as a 1d list
+
+        Args:
+            matrix (2d list): matrix to extract
+            i (int): column to use
+
+        Returns:
+            list: a 1d list of the column chosen
+        """
         return [row[i] for row in matrix]
         
     
-    def calc_fitnesses(self, ant_paths):
+    def calc_fitnesses(self, ant_paths, iter_no=0):
+        """Calculates the fitness of the ant paths passed.
+
+        Args:
+            ant_paths (list): 2d list of previously generated ant paths
+            iter_no (int, optional): Itereation we are on. Used for printing state. Defaults to 0.
+
+        Returns:
+            list(int): a list of the fitnesses of the ant paths.
+        """
         costs = []
         
         for antpath in ant_paths:
@@ -111,14 +147,24 @@ class World:
         min_index = min(range(len(costs)), key=costs.__getitem__)
         best_ant = ant_paths[min_index]
         
-        print("Best ant cost {}\n\t{}".format(min(costs), best_ant))
+        max_index = max(range(len(costs)), key=costs.__getitem__)
+        worst_ant = ant_paths[max_index]
+        
+        
+        print("iter: {}\n\tBest ant cost {}\n\tWorst ant cost {}".format(iter_no, min(costs), max(costs)))
         
         return costs, best_ant
         
     def apply_pheromones(self, ant_paths, costs):
+        """Applies ant path pheromone based on the cost list
+
+        Args:
+            ant_paths (2d list): Previously generated ant paths
+            costs (list(int)): list of costs of the previously passed ant paths
+        """
         for ant_index, ant_path in enumerate(ant_paths):
             for location, facility in enumerate(ant_path):
-                applied_pheromone = 1 / costs[ant_index]
+                applied_pheromone = 100 / costs[ant_index]
                 self.pheromones[facility][location] += applied_pheromone
             
     
@@ -155,14 +201,14 @@ def runtest(w):
     assert c[0] == 5941988
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.9)
+    w = World("Uni50a.dat", m=100, e=0.5)
 
 
     # runtest(w)
     
-    for x in range(100):
+    for x in range(1000):
         a = w.generate_ant_paths()
-        c,ba = w.calc_fitnesses(a)
+        c,ba = w.calc_fitnesses(a, x+1)
         w.apply_pheromones(a,c)
         w.evaporate_pheromones()
         
