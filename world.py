@@ -1,7 +1,7 @@
 from random import SystemRandom
 
 class World:
-    def __init__(self, filename, m=100, e=0.5):
+    def __init__(self, filename, m=100, e=0.5, print_data=True):
         """Initializes a world using an m (ant count) and e (evaporation coefficient)
         A world in this case is a matrix of distances, a matrix of flow values between facilities, 
         and a node count. A pheromone matrix is also created, where pheromone[i][j] is the bias of
@@ -12,12 +12,14 @@ class World:
             m (int, optional): ant count. Defaults to 100.
             e (float, optional): evaporation rate. Defaults to 0.5.
         """
-        print("Initializing World with {}".format(filename))
+        if print_data:
+            print("Initializing World with {}".format(filename))
         
         self.m = m
         self.e = e
         
-        print("Ant count: {}; Evaporation rate: {}".format(m,e))
+        if print_data:
+            print("Ant count: {}; Evaporation rate: {}".format(m,e))
         with open(filename, "r") as f:
             # Splitting data by  line
             data = f.read().split("\n")
@@ -30,23 +32,26 @@ class World:
 
             # n nodes is straighforward
             self.n_nodes = int(data.pop(0)[0])
-
-            print("Number of nodes: {}".format(self.n_nodes))
+            
+            if print_data:
+                print("Number of nodes: {}".format(self.n_nodes))
             
             self.distances = []
             
             # moving thru array and parsing values
             for i in range(self.n_nodes):
                 self.distances.append([int(val) for val in data.pop(0)])
-                
-            print("Distance matrix loaded")
+             
+            if print_data:
+                print("Distance matrix loaded")
             
             self.flow = []
             
             for i in range(self.n_nodes):
                 self.flow.append([int(val) for val in data.pop(0)])
             
-            print("Flow matrix loaded")
+            if print_data:
+                print("Flow matrix loaded")
             
             self.pheromones = []
             rng = SystemRandom()
@@ -54,8 +59,9 @@ class World:
             # Setting random pheromone values per row
             for i in range(self.n_nodes):
                 self.pheromones.append([rng.random() for _ in range(self.n_nodes)])
-                
-            print("Pheromone table created")
+            
+            if print_data:
+                print("Pheromone table created")
             
             
     def generate_ant_paths(self, m=None):
@@ -77,10 +83,13 @@ class World:
         for _ in range(m):
             ant_path = []
             
+            first = rng.randint(0,49)
             # Facility 0 is at location 0
-            ant_path.append(0)
+            ant_path.append(first)
             
-            facilities = [i for i in range(1,self.n_nodes)]
+            facilities = [i for i in range(0,self.n_nodes)]
+            
+            facilities.remove(first)
             
             # the index in an ant path is the location (0-49)
             # We want to place a random facility at each location according to pheromone
@@ -116,7 +125,7 @@ class World:
         return [row[i] for row in matrix]
         
     
-    def calc_fitnesses(self, ant_paths, iter_no=0):
+    def calc_fitnesses(self, ant_paths, iter_no=0, print_data=True):
         """Calculates the fitness of the ant paths passed.
 
         Args:
@@ -150,10 +159,10 @@ class World:
         max_index = max(range(len(costs)), key=costs.__getitem__)
         worst_ant = ant_paths[max_index]
         
+        if print_data:
+            print("iter: {}\n\tBest ant cost {}\n\tWorst ant cost {}".format(iter_no, min(costs), max(costs)))
         
-        print("iter: {}\n\tBest ant cost {}\n\tWorst ant cost {}".format(iter_no, min(costs), max(costs)))
-        
-        return costs, best_ant
+        return costs, best_ant, costs[min_index]
         
     def apply_pheromones(self, ant_paths, costs):
         """Applies ant path pheromone based on the cost list
@@ -164,7 +173,7 @@ class World:
         """
         for ant_index, ant_path in enumerate(ant_paths):
             for location, facility in enumerate(ant_path):
-                applied_pheromone = 100 / costs[ant_index]
+                applied_pheromone = 1 / costs[ant_index]
                 self.pheromones[facility][location] += applied_pheromone
             
     
@@ -201,7 +210,7 @@ def runtest(w):
     assert c[0] == 5941988
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.5)
+    w = World("Uni50a.dat", m=100, e=0.9)
 
 
     # runtest(w)
