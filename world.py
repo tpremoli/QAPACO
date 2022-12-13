@@ -135,34 +135,42 @@ class World:
         Returns:
             list(int): a list of the fitnesses of the ant paths.
         """
-        costs = []
+        total_costs = []
+        step_costs = []
         
         for antpath in ant_paths:
-            cost = 0
+            total_cost = 0
+            lines_cost = []
             
             # This is exactly the math equation
             for i in range(self.n_nodes):
+                curr_cost = 0
                 for j in range(self.n_nodes):
                     # Distance between locations i and j
                     D = self.distances[i][j]
                     
                     # flow between the facilities at locations i and j
                     F = self.flow[antpath[i]][antpath[j]]
-                    
-                    cost += D*F
-            
-            costs.append(cost)
 
-        min_index = min(range(len(costs)), key=costs.__getitem__)
+                    curr_cost += D*F
+                    
+                total_cost += curr_cost
+                lines_cost.append(curr_cost)
+                
+
+            step_costs.append(lines_cost)
+            total_costs.append(total_cost)
+
+        min_index = min(range(len(total_costs)), key=total_costs.__getitem__)
         best_ant = ant_paths[min_index]
         
-        max_index = max(range(len(costs)), key=costs.__getitem__)
+        max_index = max(range(len(total_costs)), key=total_costs.__getitem__)
         worst_ant = ant_paths[max_index]
         
         if print_data:
-            print("iter: {}\n\tBest ant cost {}\n\tWorst ant cost {}".format(iter_no, min(costs), max(costs)))
+            print("iter: {}\n\tBest ant cost {}\n\tWorst ant cost {}".format(iter_no, min(total_costs), max(total_costs)))
         
-        return costs, best_ant, costs[min_index]
+        return total_costs, best_ant, total_costs[min_index], step_costs
         
     def apply_pheromones(self, ant_paths, costs):
         """Applies ant path pheromone based on the cost list
@@ -173,7 +181,7 @@ class World:
         """
         for ant_index, ant_path in enumerate(ant_paths):
             for location, facility in enumerate(ant_path):
-                applied_pheromone = 1 / costs[ant_index]
+                applied_pheromone = 1 / costs[ant_index][location]
                 self.pheromones[facility][location] += applied_pheromone
             
     
@@ -210,15 +218,15 @@ def runtest(w):
     assert c[0] == 5941988
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.9)
+    w = World("Uni50a.dat", m=100, e=0.5)
 
 
     # runtest(w)
     
     for x in range(1000):
         a = w.generate_ant_paths()
-        c,ba = w.calc_fitnesses(a, x+1)
-        w.apply_pheromones(a,c)
+        c,ba,bac,step_costs = w.calc_fitnesses(a, x+1)
+        w.apply_pheromones(a,step_costs)
         w.evaporate_pheromones()
         
     
