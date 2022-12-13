@@ -189,17 +189,21 @@ class World:
             avgs_list.append(sum(sublist) / len(sublist))
         return avgs_list
     
-    def plt_fitnesses(self, num):
+    def plt_fitnesses(self, num, all_costs=None):
         """Plots best and average ants for each iteration
 
         Args:
             num (int): id of figure
+            all_costs (list, optional): 2d array containing all cost calcs. defaults to this world's instance 
         """
+        if not all_costs:
+            all_costs = self.all_costs
+            
         plt.figure(figsize = (20, 10), num=num)
-        x = [i for i in range(len(self.all_costs))]
-        y1 = self.convert_to_avgs(self.all_costs)
+        x = [i for i in range(len(all_costs))]
+        y1 = self.convert_to_avgs(all_costs)
         plt.plot(x, y1, label="Average solution cost")
-        y2 = [min(i) for i in self.all_costs]
+        y2 = [min(i) for i in all_costs]
         plt.plot(x, y2, label="Best solution cost")
         
         plt.title("ACO fitness over time. m:{} e:{} attempt {}".format(self.m,self.e,num), size=26)
@@ -221,6 +225,15 @@ class World:
         else:
             mult_e = lambda x: x*self.e
         self.pheromones =  [list(map(mult_e, sublist)) for sublist in self.pheromones]
+
+    def get_total_avg(self):
+        """Gets the average ant cost across all iterations
+
+        Returns:
+            int: average cost of all ants across all iterations
+        """
+        avg_list = self.convert_to_avgs(self.all_costs)
+        return sum(avg_list) / len(avg_list)
 
 def runtest(w):
     """This runs a quick test to ensure the pheromone placing works
