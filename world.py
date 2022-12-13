@@ -1,4 +1,5 @@
 from random import SystemRandom
+import matplotlib.pyplot as plt
 
 class World:
     def __init__(self, filename, m=100, e=0.5, print_data=True):
@@ -11,9 +12,13 @@ class World:
             filename (str): Distance and Flow filename to open
             m (int, optional): ant count. Defaults to 100.
             e (float, optional): evaporation rate. Defaults to 0.5.
+            print_data (bool, optional): whether to print current state. Defautls to true
         """
         if print_data:
             print("Initializing World with {}".format(filename))
+        
+        # This keeps track of costs for plotting
+        self.all_costs = []
         
         self.m = m
         self.e = e
@@ -158,9 +163,11 @@ class World:
         
         max_index = max(range(len(costs)), key=costs.__getitem__)
         worst_ant = ant_paths[max_index]
-        
+
         if print_data:
             print("iter: {}\n\tBest ant cost {}\n\tWorst ant cost {}".format(iter_no, min(costs), max(costs)))
+        
+        self.all_costs.append(costs)
         
         return costs, best_ant, costs[min_index]
         
@@ -175,7 +182,32 @@ class World:
             for location, facility in enumerate(ant_path):
                 applied_pheromone = 1 / costs[ant_index]
                 self.pheromones[facility][location] += applied_pheromone
-            
+
+    def convert_to_avgs(self, list):
+        avgs_list = []
+        for sublist in list:
+            avgs_list.append(sum(sublist) / len(sublist))
+        return avgs_list
+    
+    def plt_fitnesses(self, num):
+        """Plots best and average ants for each iteration
+
+        Args:
+            num (int): id of figure
+        """
+        plt.figure(figsize = (20, 10), num=num)
+        x = [i for i in range(len(self.all_costs))]
+        y1 = self.convert_to_avgs(self.all_costs)
+        plt.plot(x, y1, label="Average solution cost")
+        y2 = [min(i) for i in self.all_costs]
+        plt.plot(x, y2, label="Best solution cost")
+        
+        plt.title("ACO fitness over time. m:{} e:{} attempt {}".format(self.m,self.e,num), size=26)
+        plt.ylabel("Cost (lower is better)", size = 20)
+        plt.xlabel("Iteration", size = 20)
+        plt.legend(prop={'size': 20})
+        plt.grid(color = 'gray', axis = 'y', alpha = 0.6, zorder = 0)
+
     
     def evaporate_pheromones(self, e=None):
         """Evaporates pheromones according to evaporation rate
@@ -210,15 +242,17 @@ def runtest(w):
     assert c[0] == 5941988
 
 if __name__  == "__main__":
-    w = World("Uni50a.dat", m=100, e=0.9)
+    w = World("Uni50a.dat", m=10, e=0.9)
 
 
     # runtest(w)
     
-    for x in range(1000):
+    for x in range(100):
         a = w.generate_ant_paths()
-        c,ba = w.calc_fitnesses(a, x+1)
+        c,ba, bai = w.calc_fitnesses(a, x+1)
         w.apply_pheromones(a,c)
         w.evaporate_pheromones()
+    w.plt_fitnesses(num = 0)
+    plt.savefig("hello.png")
         
     
