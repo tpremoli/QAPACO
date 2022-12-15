@@ -4,6 +4,7 @@ actually executes this.
 
 Running this file will run all 4 experiments described in the markscheme and save outputs to out folder
 """
+import pickle
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from world import World
@@ -32,10 +33,19 @@ def single_aco(i, m, e, max_iter, print_data):
 
     avgant_cost = w.get_total_avg()
     w.plt_fitnesses(num=i+1)
-    f = open("out/m_{}_e_{}_attempt_{}.out".format(m,e,i+1), "w")
+    
+    name = "m_{}_e_{}_attempt_{}".format(m,e,i+1)
+    # We write the result stats
+    f = open("stats/{}.out".format(name), "w")
     f.write("attempt {}\n\tbest ant cost: {}\n\tavg ant cost: {}\n\tant:{}".format(i+1,bestant_cost,avgant_cost,bestant))
     f.close()
-    plt.savefig("plots/m_{}_e_{}_attempt_{}.png".format(m,e,i+1))
+    
+    # We save the figure
+    plt.savefig("plots/{}.png".format(name))
+    
+    # We save the world object
+    world_save = open("worlds/{}.pkl".format(name), 'wb')
+    pickle.dump(w, world_save, pickle.HIGHEST_PROTOCOL)
     
 def run_process(no_attempts, m, e, max_iter=10_000, print_data=False):
     """Creates multiprocesses ACO according to no_attempts
@@ -58,6 +68,11 @@ def run_process(no_attempts, m, e, max_iter=10_000, print_data=False):
     
     # We use tuples for arguments
     pool.starmap(single_aco,inputs)
-    
+
+def load_pickle(filename):
+    f = open(filename, 'rb')
+    w = pickle.load(f)
+    return w
+
 if __name__  == "__main__":
-    run_process(1, 10, 0.5, max_iter=10, print_data=False)
+    pass
