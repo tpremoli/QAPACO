@@ -1,5 +1,6 @@
 from random import SystemRandom
 import matplotlib.pyplot as plt
+import numpy.random as npr
 
 class World:
     def __init__(self, filename, m=100, e=0.5, print_data=True):
@@ -108,8 +109,12 @@ class World:
                     if facility in facilities:
                         final_pheromones.append(pheromone)
                 
+                max = sum(final_pheromones)
+                selection_probs = [x/max for x in final_pheromones]
+                
+            
                 # The pheromone corresponds to the fitness of putting facility i in location j
-                next_facility = rng.choices(facilities,weights=final_pheromones,k=1)[0]
+                next_facility = facilities[npr.choice(len(final_pheromones), p=selection_probs)]
                 ant_path.append(next_facility)
                 facilities.remove(next_facility)
             
@@ -260,7 +265,7 @@ if __name__  == "__main__":
 
     # runtest(w)
     
-    for x in range(100):
+    for x in range(1000):
         a = w.generate_ant_paths()
         c,ba, bai = w.calc_fitnesses(a, x+1)
         w.apply_pheromones(a,c)
