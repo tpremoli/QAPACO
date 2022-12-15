@@ -32,8 +32,10 @@ def single_aco(i, m, e, max_iter, print_data):
 
     avgant_cost = w.get_total_avg()
     w.plt_fitnesses(num=i+1)
-    print("\tattempt {} best ant cost: {}\n\tavg ant cost: {}\n\tant:{}".format(i+1,bestant_cost,avgant_cost,bestant))
-    plt.show()
+    f = open("out/m_{}_e_{}_attempt_{}.out".format(m,e,i+1), "w")
+    f.write("attempt {}\n\tbest ant cost: {}\n\tavg ant cost: {}\n\tant:{}".format(i+1,bestant_cost,avgant_cost,bestant))
+    f.close()
+    plt.savefig("plots/m_{}_e_{}_attempt_{}.png".format(m,e,i+1))
     
 def run_process(no_attempts, m, e, max_iter=10_000, print_data=False):
     """Creates multiprocesses ACO according to no_attempts
@@ -58,4 +60,4 @@ def run_process(no_attempts, m, e, max_iter=10_000, print_data=False):
     pool.starmap(single_aco,inputs)
     
 if __name__  == "__main__":
-    
+    run_process(1, 10, 0.5, max_iter=10, print_data=False)
