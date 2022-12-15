@@ -75,4 +75,8 @@ def load_pickle(filename):
     return w
 
 if __name__  == "__main__":
-    pass
+    #run_process(5, m=10, e=0.9, max_iter=10_000, print_data=False)
+    run_process(5, m=10, e=0.5, max_iter=10_000, print_data=False)
+    run_process(5, m=100, e=0.9, max_iter=10_000, print_data=False)
+    run_process(5, m=100, e=0.5, max_iter=10_000, print_data=False)
+

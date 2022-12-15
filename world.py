@@ -110,8 +110,12 @@ class World:
                         final_pheromones.append(pheromone)
                 
                 max = sum(final_pheromones)
-                selection_probs = [x/max for x in final_pheromones]
-                
+                # if all are 0, all values are identical
+                if max == 0:
+                    uniform = 1/len(final_pheromones)
+                    selection_probs = [uniform for _ in range(len(final_pheromones))]
+                else:
+                    selection_probs = [x/max for x in final_pheromones]
             
                 # The pheromone corresponds to the fitness of putting facility i in location j
                 next_facility = facilities[npr.choice(len(final_pheromones), p=selection_probs)]
