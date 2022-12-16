@@ -17,6 +17,7 @@ def single_aco(i, m, e, max_iter, print_data, filename):
         m (int): m val for world, ant count
         max_iter (int, optional): Max interations of the process. Defaults to 1000.
         print_data (bool, optional): Whether to print each step's data. Defaults to False.
+        filename (str, optional): The filename of the QAP file to use. Defaults to Uni50a.dat
     """
     print("Launching attempt {}".format(i+1))
     w = World(filename, m=m, e=e, print_data=print_data)
@@ -56,6 +57,7 @@ def run_process(no_attempts, m, e, max_iter=10_000, print_data=False, filename="
         m (int): m val for world, ant count
         max_iter (int, optional): Max interations of the process. Defaults to 1000.
         print_data (bool, optional): Whether to print each step's data. Defaults to False.
+        filename (str, optional): The filename of the QAP file to use. Defaults to Uni50a.dat
     """
     
     print("m: {}, e: {}".format(m,e))
@@ -74,7 +76,7 @@ def load_pickle(filename):
     w = pickle.load(f)
     return w
 
-def run_random(m, e, max_iter=10_000, print_data=False):
+def run_random(m, e, max_iter=10_000, print_data=False, filename="Uni50a.dat"):
     """This method runs the ACO with completely random ant paths
 
     Args:
@@ -82,9 +84,10 @@ def run_random(m, e, max_iter=10_000, print_data=False):
         m (int): m val for world, ant count
         max_iter (int, optional): Max interations of the process. Defaults to 1000.
         print_data (bool, optional): Whether to print each step's data. Defaults to False.
+        filename (str, optional): The filename of the QAP file to use. Defaults to Uni50a.dat
     """
     print("Launching random attempt")
-    w = World("Uni50a.dat", m=m, e=e, print_data=print_data)
+    w = World(filename, m=m, e=e, print_data=print_data)
     bestant_cost = 10000000000000000000000000000000000000000000000
     bestant = []
     for x in range(max_iter):
