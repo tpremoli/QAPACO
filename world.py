@@ -139,6 +139,45 @@ class World:
         return [row[i] for row in matrix]
         
     
+    def gen_random_solutions(self, m=None):
+        """Generates and returns fully random ant paths
+
+        Args:
+            m (int, optional): Ant count. Defaults to self.m.
+
+        Returns:
+            list(int): a list of int values. In this list, list[location] = facility
+        """
+        ants = []
+        rng = SystemRandom()
+        
+        if not m:
+            m = self.m
+
+        # for each ant
+        for _ in range(m):
+            ant_path = []
+            
+            first = rng.randint(0,49)
+            # Facility 0 is at location 0
+            ant_path.append(first)
+            
+            facilities = [i for i in range(0,self.n_nodes)]
+            
+            facilities.remove(first)
+            
+            # the index in an ant path is the location (0-49)
+            # We want to place a random facility at each location according to pheromone
+            for loc in range(1, self.n_nodes):
+                # The pheromone corresponds to the fitness of putting facility i in location j
+                next_facility = facilities[npr.choice(len(facilities))]
+                ant_path.append(next_facility)
+                facilities.remove(next_facility)
+            
+            ants.append(ant_path)
+                
+        return ants
+    
     def calc_fitnesses(self, ant_paths, iter_no=0, print_data=True):
         """Calculates the fitness of the ant paths passed.
 

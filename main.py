@@ -74,9 +74,47 @@ def load_pickle(filename):
     w = pickle.load(f)
     return w
 
+def run_random(m, e, max_iter=10_000, print_data=False):
+    """This method runs the ACO with completely random ant paths
+
+    Args:
+        e (float): e val for world, evaporation rate
+        m (int): m val for world, ant count
+        max_iter (int, optional): Max interations of the process. Defaults to 1000.
+        print_data (bool, optional): Whether to print each step's data. Defaults to False.
+    """
+    print("Launching random attempt")
+    w = World("Uni50a.dat", m=m, e=e, print_data=print_data)
+    bestant_cost = 10000000000000000000000000000000000000000000000
+    bestant = []
+    for x in range(max_iter):
+        a = w.gen_random_solutions()
+        _, new_bestant, new_bestant_cost = w.calc_fitnesses(a, x+1, print_data=print_data)
+        if new_bestant_cost < bestant_cost:
+            bestant = new_bestant
+            bestant_cost = new_bestant_cost
+
+    avgant_cost = w.get_total_avg()
+    w.plt_fitnesses(num="r")
+    
+    name = "m_{}_e_{}_random".format(m,e)
+    # We write the result stats
+    f = open("stats/{}.out".format(name), "w")
+    f.write("random attempt\n\tbest ant cost: {}\n\tavg ant cost: {}\n\tant:{}".format(bestant_cost,avgant_cost,bestant))
+    f.close()
+    
+    # We save the figure
+    plt.savefig("plots/{}.png".format(name))
+    
+    # We save the world object
+    world_save = open("worlds/{}.pkl".format(name), 'wb')
+    pickle.dump(w, world_save, pickle.HIGHEST_PROTOCOL)
+
 if __name__  == "__main__":
-    run_process(5, m=10, e=0.9, max_iter=10_000, print_data=False)
-    run_process(5, m=10, e=0.5, max_iter=10_000, print_data=False)
-    run_process(5, m=100, e=0.9, max_iter=10_000, print_data=False)
-    run_process(5, m=100, e=0.5, max_iter=10_000, print_data=False)
+    #run_process(5, m=10, e=0.9, max_iter=10_000, print_data=False)
+    #run_process(5, m=10, e=0.5, max_iter=10_000, print_data=False)
+    #run_process(5, m=100, e=0.9, max_iter=10_000, print_data=False)
+    #run_process(5, m=100, e=0.5, max_iter=10_000, print_data=False)
+
+    run_random(m=100, e=0.9, max_iter=5000, print_data=True)
 
