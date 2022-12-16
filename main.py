@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from world import World
 
-def single_aco(i, m, e, max_iter, print_data):
+def single_aco(i, m, e, max_iter, print_data, filename):
     """This method runs the ACO with the specified parameters and plots them. This will usually be ran as a subprocess (do multiple attempts @once)
 
     Args:
@@ -19,7 +19,7 @@ def single_aco(i, m, e, max_iter, print_data):
         print_data (bool, optional): Whether to print each step's data. Defaults to False.
     """
     print("Launching attempt {}".format(i+1))
-    w = World("Uni50a.dat", m=m, e=e, print_data=print_data)
+    w = World(filename, m=m, e=e, print_data=print_data)
     bestant_cost = 10000000000000000000000000000000000000000000000
     bestant = []
     for x in range(max_iter):
@@ -47,7 +47,7 @@ def single_aco(i, m, e, max_iter, print_data):
     world_save = open("worlds/{}.pkl".format(name), 'wb')
     pickle.dump(w, world_save, pickle.HIGHEST_PROTOCOL)
     
-def run_process(no_attempts, m, e, max_iter=10_000, print_data=False):
+def run_process(no_attempts, m, e, max_iter=10_000, print_data=False, filename="Uni50a.dat"):
     """Creates multiprocesses ACO according to no_attempts
     
     Args:
@@ -64,7 +64,7 @@ def run_process(no_attempts, m, e, max_iter=10_000, print_data=False):
     pool = Pool(processes=no_attempts)
     inputs = []
     for i in range(no_attempts):
-        inputs.append((i,m,e,max_iter,print_data))
+        inputs.append((i,m,e,max_iter,print_data,filename))
     
     # We use tuples for arguments
     pool.starmap(single_aco,inputs)
