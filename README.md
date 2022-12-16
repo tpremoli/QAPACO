@@ -1,6 +1,7 @@
 # QAPACO - Ant Colony Optimization for the Quadratic Assignment Problem
 
 Github link: https://github.com/tpremoli/QAPACO
+
 ## Introduction
 
 This program is an exploration into ant-colony optimization (ACO) for the quadratic assignment problem (QAP). 
